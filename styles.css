@@ -10,7 +10,9 @@ html, body {
 
 body {
   display: grid;
-  place-items: center;
+  /* Top-anchored so About Us and the countdown sit near the top of the
+     viewport with a small breathing margin; the stack falls below. */
+  place-items: start center;
   overflow: hidden;
 }
 
@@ -174,9 +176,6 @@ body.about {
   width: min(67vh, 92vw);
   aspect-ratio: 2 / 3;
   position: relative;
-  /* Visually pull the stack up without changing the flex column height,
-     so the countdown and About link stay anchored at their original spots. */
-  transform: translateY(-75px);
 }
 
 .stage {
