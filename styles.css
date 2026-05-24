@@ -151,14 +151,15 @@ body.about {
     drop-shadow(2px 6px 8px rgba(0, 0, 0, 0.10))
     drop-shadow(8px 22px 36px rgba(0, 0, 0, 0.10));
 
-  /* Stacked PNG is larger and visually heavier — slightly bigger shadow */
+  /* Stacked PNG is larger and visually heavier — slightly bigger shadow.
+     X offset zeroed so the shadow sits directly underneath, not to the right. */
   --shadow-rest-stack:
-    drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.09))
-    drop-shadow(6px 16px 28px rgba(0, 0, 0, 0.08));
+    drop-shadow(0 4px 6px rgba(0, 0, 0, 0.09))
+    drop-shadow(0 16px 28px rgba(0, 0, 0, 0.08));
 
   --shadow-hover-stack:
-    drop-shadow(3px 8px 10px rgba(0, 0, 0, 0.11))
-    drop-shadow(10px 28px 44px rgba(0, 0, 0, 0.11));
+    drop-shadow(0 8px 10px rgba(0, 0, 0, 0.11))
+    drop-shadow(0 28px 44px rgba(0, 0, 0, 0.11));
 }
 
 /* ---------- Stage ----------
@@ -243,6 +244,8 @@ body.about {
     transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
     opacity 0.45s ease 0.05s;
   outline: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 /* Override transform-duration during the spread fly-out (longer/eased) */
@@ -327,10 +330,14 @@ body.about {
   cursor: grabbing;
   transform: translate(0, 0) scale(1) rotate(var(--rot));
   transition: none;
+  /* Promote to its own GPU layer — kills shadow-trail artifacts on iOS
+     where filter: drop-shadow gets re-rasterized per pointer-move frame. */
+  will-change: transform;
 }
 
 .stage.spread .product.dragging img {
-  filter: var(--shadow-hover);
+  /* Keep the rest shadow during drag. Swapping to --shadow-hover here
+     caused visible shadow ghosting on iOS as the element moved. */
   transition: none;
 }
 
