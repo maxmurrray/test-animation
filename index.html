@@ -14,20 +14,24 @@
     </nav>
 
     <div class="countdown" id="countdown" aria-live="polite">
-      <div class="countdown-row">
-        <span class="countdown-num" id="cd-days">--</span>
-        <span class="countdown-sep">:</span>
-        <span class="countdown-num" id="cd-hours">--</span>
-        <span class="countdown-sep">:</span>
-        <span class="countdown-num" id="cd-mins">--</span>
-        <span class="countdown-sep">:</span>
-        <span class="countdown-num" id="cd-secs">--</span>
+      <div class="cd-unit">
+        <span class="cd-num" id="cd-days">--</span>
+        <span class="cd-label">DAYS</span>
       </div>
-      <div class="countdown-labels">
-        <span>DAYS</span>
-        <span>HRS</span>
-        <span>MIN</span>
-        <span>SEC</span>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit">
+        <span class="cd-num" id="cd-hours">--</span>
+        <span class="cd-label">HRS</span>
+      </div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit">
+        <span class="cd-num" id="cd-mins">--</span>
+        <span class="cd-label">MIN</span>
+      </div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit">
+        <span class="cd-num" id="cd-secs">--</span>
+        <span class="cd-label">SEC</span>
       </div>
     </div>
 
