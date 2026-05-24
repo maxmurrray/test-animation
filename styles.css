@@ -1,0 +1,304 @@
+/* ---------- Page ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  color: #111;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ---------- Top nav ----------
+   Sits directly above the stack as a small editorial link. The .layout
+   flex column groups it with the stage so they're centered together. */
+.layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: center;
+  margin-top: 36px;
+}
+
+.nav-link {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #444;
+  padding: 6px 2px;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover { color: #c9342c; }
+
+/* ---------- About page ----------
+   The about page reuses the same body / nav. Its <body class="about">
+   switches the body to a scrollable column with a centered text article. */
+body.about {
+  display: block;
+  overflow: auto;
+  background: #fff;
+  color: #1a1a1a;
+}
+
+.about .top-nav {
+  padding: 32px 0 0;
+  margin-bottom: 56px;
+}
+
+.about-main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 24px 96px;
+}
+
+.about-content h2 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  margin: 48px 0 20px;
+  color: #111;
+}
+
+.about-content h2:first-of-type { margin-top: 0; }
+
+.about-content p {
+  font-size: 17px;
+  line-height: 1.7;
+  margin: 0 0 18px;
+  color: #2a2a2a;
+}
+
+.about-content .lede {
+  font-size: 19px;
+  font-style: italic;
+  color: #111;
+  margin-bottom: 24px;
+}
+
+.about-content .signature {
+  font-style: italic;
+  color: #555;
+  margin-top: 32px;
+}
+
+/* ---------- Shadow tokens ----------
+   Two-layer drop-shadow modeled on studio flat-lay product photography:
+   a small soft "contact" shadow plus a larger diffuse "ambient" shadow.
+   The light source reads from the upper-left, so both shadows offset down
+   and slightly right. The hover variant lifts and lengthens both layers. */
+:root {
+  --shadow-rest:
+    drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.08))
+    drop-shadow(4px 10px 18px rgba(0, 0, 0, 0.07));
+
+  --shadow-hover:
+    drop-shadow(2px 6px 8px rgba(0, 0, 0, 0.10))
+    drop-shadow(8px 22px 36px rgba(0, 0, 0, 0.10));
+
+  /* Stacked PNG is larger and visually heavier — slightly bigger shadow */
+  --shadow-rest-stack:
+    drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.09))
+    drop-shadow(6px 16px 28px rgba(0, 0, 0, 0.08));
+
+  --shadow-hover-stack:
+    drop-shadow(3px 8px 10px rgba(0, 0, 0, 0.11))
+    drop-shadow(10px 28px 44px rgba(0, 0, 0, 0.11));
+}
+
+/* ---------- Stage ----------
+   Holds the stacked-PNG (initial) and the 5 individual product PNGs
+   (final spread). Aspect 2:3 to match the birdseye reference. */
+.stage-wrap {
+  width: min(67vh, 92vw);
+  aspect-ratio: 2 / 3;
+  position: relative;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: default;
+}
+
+/* ---------- Stacked PNG (initial) ----------
+   Transparent bg so the shadow hugs the actual silhouette of the stack.
+   The clip-path approximates the silhouette of the stack (cap on top
+   narrowing in, hoodie shoulders widening, pants narrowing again) — this
+   constrains pointer events so hover/click only fire over the actual
+   clothing, not the empty page space around it. */
+.stacked {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  cursor: pointer;
+  clip-path: polygon(
+    37% 22%,   /* top-left of cap crown */
+    63% 22%,   /* top-right of cap crown */
+    72% 32%,   /* right edge, brim extending out */
+    78% 56%,   /* right of hoodie shoulder (widest point) */
+    76% 82%,   /* bottom right of pants */
+    26% 82%,   /* bottom left of pants */
+    22% 56%,   /* left of hoodie shoulder */
+    28% 32%    /* left base of cap */
+  );
+  filter: var(--shadow-rest-stack);
+  transition:
+    filter 0.35s ease,
+    opacity 0.45s ease,
+    transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.stacked:hover,
+.stage:focus-visible .stacked {
+  transform: scale(1.04);
+}
+
+.stage.spread .stacked {
+  opacity: 0;
+  transform: scale(0.94);
+  pointer-events: none;
+  cursor: default;
+  filter: var(--shadow-rest-stack);
+}
+
+/* ---------- Individual products ----------
+   Outer <a> handles position + scale + rotation. Inner <img> carries the
+   shadow filter so the resting shadow is always visible while the wrapper
+   animates. Per-product rotation lives in --rot so the hover transform
+   can recompose it without losing the tilt. */
+.product {
+  --rot: 0deg;
+  position: absolute;
+  display: block;
+  top: 50%;
+  left: 50%;
+  width: auto;
+  transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    top 0.95s cubic-bezier(0.22, 0.61, 0.36, 1),
+    left 0.95s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.45s ease 0.05s;
+  outline: none;
+}
+
+/* Override transform-duration during the spread fly-out (longer/eased) */
+.stage.spread .product {
+  transition:
+    top 0.95s cubic-bezier(0.22, 0.61, 0.36, 1),
+    left 0.95s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.95s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.45s ease 0.05s;
+}
+
+.product img {
+  display: block;
+  height: 100%;
+  width: auto;
+  filter: var(--shadow-rest);
+  transition: filter 0.3s ease;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Per-product sizing (height as % of stage) */
+.hoodie    { height: 36%; --rot: -2deg; }
+.cap       { height: 13%; --rot: 12deg; }
+.pants     { height: 32%; --rot:  6deg; }
+.tee-dark  { height: 13%; --rot: -4deg; }
+.tee-white { height: 13%; --rot:  5deg; }
+
+/* ---------- Spread state — birdseye-style positions ---------- */
+.stage.spread .product {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.stage.spread .hoodie    { top: 21%; left: 14%; transform: translate(0, 0) scale(1) rotate(var(--rot)); }
+.stage.spread .cap       { top: 25%; left: 64%; transform: translate(0, 0) scale(1) rotate(var(--rot)); }
+.stage.spread .pants     { top: 39%; left: 70%; transform: translate(0, 0) scale(1) rotate(var(--rot)); }
+.stage.spread .tee-dark  { top: 66%; left: 18%; transform: translate(0, 0) scale(1) rotate(var(--rot)); }
+.stage.spread .tee-white { top: 66%; left: 48%; transform: translate(0, 0) scale(1) rotate(var(--rot)); }
+
+/* Stagger so items leave the stack in waves */
+.stage.spread .hoodie    { transition-delay: 0s,     0s,     0s,     0s; }
+.stage.spread .pants     { transition-delay: 0.05s,  0.05s,  0.05s,  0s; }
+.stage.spread .cap       { transition-delay: 0.08s,  0.08s,  0.08s,  0s; }
+.stage.spread .tee-white { transition-delay: 0.11s,  0.11s,  0.11s,  0s; }
+.stage.spread .tee-dark  { transition-delay: 0.14s,  0.14s,  0.14s,  0s; }
+
+/* ---------- Hover (after spread): paper-lift, no glow ----------
+   Transform recomposes scale + the per-product rotation via --rot so the
+   tilt is preserved. translateY(-10px) is the "lift". Inner <img> swaps
+   to the longer hover shadow for the airborne feel. */
+.stage.spread .product:hover,
+.stage.spread .product:focus-visible {
+  transform: translate(0, -10px) scale(1.03) rotate(var(--rot));
+  transition:
+    top 0.25s cubic-bezier(0.22, 0.61, 0.36, 1),
+    left 0.25s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.25s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.25s ease;
+}
+
+.stage.spread .product:hover img,
+.stage.spread .product:focus-visible img {
+  filter: var(--shadow-hover);
+}
+
+/* ---------- Drag (after spread) ----------
+   Each product is grabbable. While dragging:
+   - JS writes inline top/left in px to follow the cursor.
+   - Transitions are killed so motion is 1:1 with the cursor.
+   - The hover-lift is canceled (on the dragged item AND on others, via
+     body.is-dragging) so nothing twitches under the cursor.
+   - The dragged item floats to the top via z-index. */
+.stage.spread .product {
+  cursor: grab;
+  touch-action: none;
+}
+
+.stage.spread .product.dragging,
+.stage.spread .product.dragging:hover,
+.stage.spread .product.dragging:focus-visible {
+  cursor: grabbing;
+  transform: translate(0, 0) scale(1) rotate(var(--rot));
+  transition: none;
+}
+
+.stage.spread .product.dragging img {
+  filter: var(--shadow-hover);
+  transition: none;
+}
+
+/* Neutralize hover-lift on non-dragged items while any drag is happening */
+body.is-dragging .stage.spread .product:hover,
+body.is-dragging .stage.spread .product:focus-visible {
+  transform: translate(0, 0) scale(1) rotate(var(--rot));
+}
+
+body.is-dragging .stage.spread .product:hover img,
+body.is-dragging .stage.spread .product:focus-visible img {
+  filter: var(--shadow-rest);
+}

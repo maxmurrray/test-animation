@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proudly Average — Product Spread Test</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="layout">
+    <nav class="top-nav">
+      <a href="about.html" class="nav-link">About Us</a>
+    </nav>
+
+    <div class="stage-wrap">
+      <div class="stage" id="stage" role="button" tabindex="0" aria-label="Spread products">
+        <img class="stacked"
+             src="assets/all-products-stacked.png"
+             alt="Stacked products">
+
+        <a class="product hoodie" href="#" aria-label="Average Hoodie">
+          <img src="assets/hoodie.png" alt="">
+        </a>
+        <a class="product cap" href="#" aria-label="Average Cap">
+          <img src="assets/hat.png" alt="">
+        </a>
+        <a class="product pants" href="#" aria-label="Average Sweatpants">
+          <img src="assets/sweats.png" alt="">
+        </a>
+        <a class="product tee-dark" href="#" aria-label="Billiards Tee">
+          <img src="assets/billiards-tee.png" alt="">
+        </a>
+        <a class="product tee-white" href="#" aria-label="Run Club Tee">
+          <img src="assets/run-club-tee.png" alt="">
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const stage = document.getElementById('stage');
+    const stacked = stage.querySelector('.stacked');
+    const spread = () => stage.classList.add('spread');
+
+    // Click on the stack → spread. The clip-path on .stacked restricts the
+    // hit area to the silhouette of the clothing.
+    stacked.addEventListener('click', () => {
+      if (!stage.classList.contains('spread')) spread();
+    });
+    stage.addEventListener('keydown', (e) => {
+      if (stage.classList.contains('spread')) return;
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); spread(); }
+    });
+
+    /* ---------- Drag the spread products ----------
+       Each product can be picked up (pointerdown) and dragged. Movement
+       under DRAG_THRESHOLD is treated as a click (anchor navigation still
+       works). Once a real drag happens, the click that follows pointerup
+       is suppressed so a drag doesn't navigate. */
+    const DRAG_THRESHOLD = 5;
+    let topZ = 10;
+
+    document.querySelectorAll('.product').forEach((product) => {
+      let startX = 0, startY = 0;
+      let offsetX = 0, offsetY = 0;
+      let pointerActive = false;
+      let dragging = false;
+
+      product.addEventListener('pointerdown', (e) => {
+        // Only draggable in the spread state, and ignore secondary buttons
+        if (!stage.classList.contains('spread')) return;
+        if (e.button !== undefined && e.button !== 0) return;
+
+        const productRect = product.getBoundingClientRect();
+        startX = e.clientX;
+        startY = e.clientY;
+        offsetX = e.clientX - productRect.left;
+        offsetY = e.clientY - productRect.top;
+        pointerActive = true;
+        dragging = false;
+        product.setPointerCapture(e.pointerId);
+      });
+
+      product.addEventListener('pointermove', (e) => {
+        if (!pointerActive) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        if (!dragging && Math.hypot(dx, dy) > DRAG_THRESHOLD) {
+          dragging = true;
+          product.classList.add('dragging');
+          document.body.classList.add('is-dragging');
+          product.style.zIndex = String(++topZ);
+        }
+
+        if (dragging) {
+          const stageRect = stage.getBoundingClientRect();
+          const newLeft = e.clientX - stageRect.left - offsetX;
+          const newTop  = e.clientY - stageRect.top  - offsetY;
+          product.style.left = newLeft + 'px';
+          product.style.top  = newTop  + 'px';
+        }
+      });
+
+      const endDrag = (e) => {
+        if (!pointerActive) return;
+        pointerActive = false;
+        try { product.releasePointerCapture(e.pointerId); } catch {}
+
+        if (dragging) {
+          product.classList.remove('dragging');
+          document.body.classList.remove('is-dragging');
+          // Swallow the click that follows so a drag doesn't navigate.
+          product.addEventListener('click', suppressOnce, { capture: true, once: true });
+        }
+        dragging = false;
+      };
+
+      product.addEventListener('pointerup', endDrag);
+      product.addEventListener('pointercancel', endDrag);
+
+      // Don't let the browser hijack the gesture with native image drag
+      product.addEventListener('dragstart', (e) => e.preventDefault());
+    });
+
+    function suppressOnce(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  </script>
+</body>
+</html>
