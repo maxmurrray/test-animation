@@ -84,16 +84,37 @@
 
     const stage = document.getElementById('stage');
     const stacked = stage.querySelector('.stacked');
-    const spread = () => stage.classList.add('spread');
+    const products = document.querySelectorAll('.product');
+
+    const spread = () => {
+      if (stage.classList.contains('spread')) return;
+      stage.classList.add('spread');
+      // Push a history entry so the browser back button can revert.
+      history.pushState({ spread: true }, '');
+    };
+
+    const restack = () => {
+      stage.classList.remove('spread');
+      // Reset any inline top/left/z-index left over from dragging.
+      products.forEach((p) => {
+        p.style.left = '';
+        p.style.top = '';
+        p.style.zIndex = '';
+      });
+    };
 
     // Click on the stack → spread. The clip-path on .stacked restricts the
     // hit area to the silhouette of the clothing.
-    stacked.addEventListener('click', () => {
-      if (!stage.classList.contains('spread')) spread();
-    });
+    stacked.addEventListener('click', spread);
     stage.addEventListener('keydown', (e) => {
       if (stage.classList.contains('spread')) return;
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); spread(); }
+    });
+
+    // Browser back (popstate) → restack. The state we pushed on spread is
+    // popped off when the user hits back, leaving the original page state.
+    window.addEventListener('popstate', () => {
+      if (stage.classList.contains('spread')) restack();
     });
 
     /* ---------- Drag the spread products ----------
