@@ -31,7 +31,7 @@ a { color: inherit; text-decoration: none; }
 .top-nav {
   display: flex;
   justify-content: center;
-  margin-top: 16px;
+  margin-top: 56px;
 }
 
 .nav-link {
