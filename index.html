@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Proudly Average — Product Spread Test</title>
+  <link rel="stylesheet" href="https://use.typekit.net/wfh3dbx.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,6 +12,24 @@
     <nav class="top-nav">
       <a href="about.html" class="nav-link">About Us</a>
     </nav>
+
+    <div class="countdown" id="countdown" aria-live="polite">
+      <div class="countdown-row">
+        <span class="countdown-num" id="cd-days">--</span>
+        <span class="countdown-sep">:</span>
+        <span class="countdown-num" id="cd-hours">--</span>
+        <span class="countdown-sep">:</span>
+        <span class="countdown-num" id="cd-mins">--</span>
+        <span class="countdown-sep">:</span>
+        <span class="countdown-num" id="cd-secs">--</span>
+      </div>
+      <div class="countdown-labels">
+        <span>DAYS</span>
+        <span>HRS</span>
+        <span>MIN</span>
+        <span>SEC</span>
+      </div>
+    </div>
 
     <div class="stage-wrap">
       <div class="stage" id="stage" role="button" tabindex="0" aria-label="Spread products">
@@ -38,6 +57,27 @@
   </main>
 
   <script>
+    /* ---------- Countdown to drop ----------
+       Target: 2026-05-29 12:00 PM EDT (UTC-4) = 16:00 UTC. */
+    const TARGET = new Date('2026-05-29T16:00:00Z').getTime();
+    const pad = (n) => String(n).padStart(2, '0');
+    const cd = {
+      d: document.getElementById('cd-days'),
+      h: document.getElementById('cd-hours'),
+      m: document.getElementById('cd-mins'),
+      s: document.getElementById('cd-secs'),
+    };
+    function tick() {
+      const diff = Math.max(0, TARGET - Date.now());
+      const sec = Math.floor(diff / 1000);
+      cd.d.textContent = pad(Math.floor(sec / 86400));
+      cd.h.textContent = pad(Math.floor((sec % 86400) / 3600));
+      cd.m.textContent = pad(Math.floor((sec % 3600) / 60));
+      cd.s.textContent = pad(sec % 60);
+      if (diff > 0) setTimeout(tick, 1000 - (Date.now() % 1000));
+    }
+    tick();
+
     const stage = document.getElementById('stage');
     const stacked = stage.querySelector('.stacked');
     const spread = () => stage.classList.add('spread');

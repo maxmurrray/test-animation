@@ -44,6 +44,48 @@ a { color: inherit; text-decoration: none; }
 
 .nav-link:hover { color: #c9342c; }
 
+/* ---------- Countdown ----------
+   Big Barlow bold numerals above the stack. */
+.countdown {
+  font-family: "barlow", sans-serif;
+  text-align: center;
+  color: #111;
+  user-select: none;
+}
+
+.countdown-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 14px;
+  font-size: clamp(48px, 9vw, 96px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown-num {
+  min-width: 1.6ch;
+  text-align: center;
+}
+
+.countdown-sep {
+  opacity: 0.35;
+  transform: translateY(-0.08em);
+}
+
+.countdown-labels {
+  display: flex;
+  justify-content: center;
+  gap: clamp(28px, 6vw, 64px);
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: #666;
+}
+
 /* ---------- About page ----------
    The about page reuses the same body / nav. Its <body class="about">
    switches the body to a scrollable column with a centered text article. */
