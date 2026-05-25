@@ -8,12 +8,7 @@ html, body {
 }
 
 body {
-  /* Lock the landing page to one viewport: hero fills the remaining
-     space, signup bar is pinned to the bottom, document never scrolls. */
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
+  display: block;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -26,11 +21,10 @@ a { color: inherit; text-decoration: none; }
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  /* Hero: takes whatever vertical space the signup bar leaves over.
-     .stage-wrap is absolute and positions itself against this
-     container, not the document. */
-  flex: 1;
-  min-height: 0;
+  /* Hero: fills the viewport. .stage-wrap is absolute and positions
+     itself against this container, not the document — so the stack
+     stays centered in the hero while the SMS sign-up sits below. */
+  height: 100vh;
   position: relative;
 }
 
@@ -134,18 +128,16 @@ a { color: inherit; text-decoration: none; }
 .cal-add-link:hover { color: #111; }
 
 /* ---------- SMS sign-up ----------
-   Slim bar pinned to the bottom of the viewport via the body flex
-   column. flex-shrink: 0 keeps it at its set height while the hero
-   absorbs everything above. */
+   Section below the hero containing the Emotive embed iframe. */
 .signup {
-  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  padding: 60px 24px 80px;
   background: #fff;
-  border-top: 1px solid #eee;
 }
 
 .signup iframe {
-  display: block;
-  width: 100%;
+  max-width: 640px;
 }
 
 /* ---------- About page ----------
