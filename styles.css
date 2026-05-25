@@ -109,6 +109,7 @@ body.about {
   overflow: auto;
   background: #fff;
   color: #1a1a1a;
+  font-family: "barlow", sans-serif;
 }
 
 .about .top-nav {
