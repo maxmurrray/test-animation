@@ -8,12 +8,7 @@ html, body {
 }
 
 body {
-  /* Lock landing page to one viewport — signup bar pins to the bottom,
-     hero takes the rest, no document scroll. */
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
+  display: block;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -26,11 +21,10 @@ a { color: inherit; text-decoration: none; }
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  /* Hero: takes whatever vertical space the signup leaves over.
-     .stage-wrap is absolute and positions itself against this
-     container, not the document. */
-  flex: 1;
-  min-height: 0;
+  /* Hero: fills the viewport. .stage-wrap is absolute and positions
+     itself against this container, not the document — so the stack
+     stays centered in the hero while the SMS sign-up sits below. */
+  height: 100vh;
   position: relative;
 }
 
@@ -134,13 +128,11 @@ a { color: inherit; text-decoration: none; }
 .cal-add-link:hover { color: #111; }
 
 /* ---------- SMS sign-up ----------
-   Pinned to the bottom of the viewport via body's flex column.
-   10px of breathing room between the iframe and the page bottom. */
+   Section below the hero containing the Emotive embed iframe. */
 .signup {
-  flex-shrink: 0;
   display: flex;
   justify-content: center;
-  padding-bottom: 10px;
+  padding: 60px 24px 80px;
   background: #fff;
 }
 
@@ -248,14 +240,12 @@ body.about {
    Holds the stacked-PNG (initial) and the 5 individual product PNGs
    (final spread). Aspect 2:3 to match the birdseye reference. */
 .stage-wrap {
-  /* min() picks the smallest of:
-     - 67vh   (visual-impact cap on tall screens)
-     - 92vw   (don't crowd the page horizontally)
-     - calc((100vh - 380px) / 1.5)  (height-aware ceiling so the stack
-       doesn't push into the signup bar; 380px buffers nav + countdown +
-       cal-add + ~330px signup. aspect-ratio is 2/3, so width × 1.5 = h.) */
-  width: min(67vh, 92vw, calc((100vh - 380px) / 1.5));
+  width: min(67vh, 92vw);
   aspect-ratio: 2 / 3;
+  /* Pulled out of the .layout flex flow and centered in the viewport so
+     About Us and the countdown stay anchored at the top while the stack
+     sits at middle-middle. Keeps the spread animation contained on
+     shorter viewports where the bottom row was clipping. */
   position: absolute;
   top: 50%;
   left: 50%;
