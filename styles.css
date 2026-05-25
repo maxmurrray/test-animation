@@ -32,6 +32,11 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   justify-content: center;
   margin-top: 56px;
+  /* Sit above the absolute-positioned .stage-wrap so the About Us
+     link is clickable; otherwise the stage's bounding box (which is
+     ~100vh tall) intercepts the click. */
+  position: relative;
+  z-index: 2;
 }
 
 .nav-link {
@@ -61,6 +66,9 @@ a { color: inherit; text-decoration: none; }
   color: #111;
   user-select: none;
   font-variant-numeric: tabular-nums;
+  /* Same reason as .top-nav — sit above the stage-wrap. */
+  position: relative;
+  z-index: 2;
 }
 
 .cd-unit {
