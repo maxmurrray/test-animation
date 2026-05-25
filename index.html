@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Proudly Average — Product Spread Test</title>
   <link rel="stylesheet" href="https://use.typekit.net/wfh3dbx.css">
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
   <main class="layout">
@@ -59,6 +59,46 @@
       </div>
     </div>
   </main>
+
+  <!-- ===================== Easter egg: vault =====================
+       Triggered when the five products are restacked in the order:
+         pants (bottom) → hoodie → tee-dark → tee-white → cap (top)
+       The check looks for: (a) all five item centers within 80px of each
+       other, and (b) z-index strictly ascending in that sequence. The
+       cap must be the last item dragged. ============================ -->
+  <div id="vault" class="vault" aria-hidden="true" role="dialog" aria-labelledby="vault-code">
+    <div class="vault-stage">
+      <svg class="vault-svg" viewBox="0 0 400 400" aria-hidden="true">
+        <circle class="vd-door"  cx="200" cy="200" r="180"/>
+        <g class="vd-bolts">
+          <circle cx="200" cy="46"  r="5"/>
+          <circle cx="354" cy="200" r="5"/>
+          <circle cx="200" cy="354" r="5"/>
+          <circle cx="46"  cy="200" r="5"/>
+          <circle cx="92"  cy="92"  r="5"/>
+          <circle cx="308" cy="92"  r="5"/>
+          <circle cx="308" cy="308" r="5"/>
+          <circle cx="92"  cy="308" r="5"/>
+        </g>
+        <circle class="vd-inner" cx="200" cy="200" r="120"/>
+        <g class="vd-dial">
+          <circle class="vd-dial-bg" cx="200" cy="200" r="80"/>
+          <rect   class="vd-indicator" x="195" y="116" width="10" height="22" rx="2"/>
+        </g>
+        <circle class="vd-center" cx="200" cy="200" r="14"/>
+        <circle class="vd-flash"  cx="200" cy="200" r="180"/>
+      </svg>
+      <div class="vault-reveal">
+        <p class="vault-eyebrow">VAULT UNLOCKED</p>
+        <p class="vault-code" id="vault-code">HAPPY2026</p>
+        <p class="vault-desc">100% off your purchase</p>
+        <div class="vault-actions">
+          <button type="button" class="vault-btn" id="vault-copy">Copy code</button>
+          <button type="button" class="vault-btn vault-btn--ghost" id="vault-close">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     /* ---------- Countdown to drop ----------
@@ -177,6 +217,8 @@
           document.body.classList.remove('is-dragging');
           // Swallow the click that follows so a drag doesn't navigate.
           product.addEventListener('click', suppressOnce, { capture: true, once: true });
+          // After each completed drag, check if the easter-egg stack is in place.
+          maybeUnlockVault();
         }
         dragging = false;
       };
@@ -192,6 +234,97 @@
       e.preventDefault();
       e.stopPropagation();
     }
+
+    /* ===================== Vault easter egg =====================
+       Bottom-to-top target order. The z-index check is "strictly
+       ascending" in this sequence, so the cap must be the most-
+       recently dragged item. */
+    const STACK_ORDER = ['pants', 'hoodie', 'tee-dark', 'tee-white', 'cap'];
+    const STACK_TOL = 80;
+    let vaultUnlocked = false;
+
+    function maybeUnlockVault() {
+      if (vaultUnlocked) return;
+      if (!stage.classList.contains('spread')) return;
+
+      const items = STACK_ORDER.map((cls) => stage.querySelector('.product.' + cls));
+      if (items.some((el) => !el)) return;
+
+      const centers = items.map((el) => {
+        const r = el.getBoundingClientRect();
+        return {
+          x: r.left + r.width / 2,
+          y: r.top + r.height / 2,
+          z: parseInt(el.style.zIndex || '10', 10),
+        };
+      });
+
+      // 1) All five centers within STACK_TOL of each other (max pairwise).
+      for (let i = 0; i < centers.length - 1; i++) {
+        for (let j = i + 1; j < centers.length; j++) {
+          const dx = centers[i].x - centers[j].x;
+          const dy = centers[i].y - centers[j].y;
+          if (Math.hypot(dx, dy) > STACK_TOL) return;
+        }
+      }
+
+      // 2) z-order strictly ascending: pants < hoodie < tee-dark < tee-white < cap
+      for (let i = 1; i < centers.length; i++) {
+        if (centers[i].z <= centers[i - 1].z) return;
+      }
+
+      openVault();
+    }
+
+    const vault = document.getElementById('vault');
+    const vaultCopyBtn = document.getElementById('vault-copy');
+    const vaultCloseBtn = document.getElementById('vault-close');
+
+    function openVault() {
+      vaultUnlocked = true;
+      vault.classList.add('open');
+      vault.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeVault() {
+      vault.classList.remove('open');
+      vault.setAttribute('aria-hidden', 'true');
+      // Reset the copy button label in case it's still showing "Copied!".
+      vaultCopyBtn.textContent = 'Copy code';
+      vaultCopyBtn.classList.remove('copied');
+      // Allow replay by re-stacking — flip the flag after the fade-out completes.
+      setTimeout(() => { vaultUnlocked = false; }, 600);
+    }
+
+    vaultCopyBtn.addEventListener('click', async () => {
+      const code = 'HAPPY2026';
+      try {
+        await navigator.clipboard.writeText(code);
+      } catch {
+        // Older-browser fallback.
+        const t = document.createElement('textarea');
+        t.value = code;
+        t.style.position = 'fixed';
+        t.style.opacity = '0';
+        document.body.appendChild(t);
+        t.select();
+        try { document.execCommand('copy'); } catch {}
+        document.body.removeChild(t);
+      }
+      vaultCopyBtn.classList.add('copied');
+      vaultCopyBtn.textContent = 'Copied!';
+      setTimeout(() => {
+        vaultCopyBtn.classList.remove('copied');
+        vaultCopyBtn.textContent = 'Copy code';
+      }, 1800);
+    });
+
+    vaultCloseBtn.addEventListener('click', closeVault);
+
+    // Escape key also closes the vault when open.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && vault.classList.contains('open')) closeVault();
+    });
   </script>
 </body>
 </html>

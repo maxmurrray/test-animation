@@ -374,3 +374,198 @@ body.is-dragging .stage.spread .product:hover img,
 body.is-dragging .stage.spread .product:focus-visible img {
   filter: var(--shadow-rest);
 }
+
+/* ===================== Vault easter egg =====================
+   Hidden until JS flips .vault.open. Built from a few stacked
+   SVG primitives — outer door, bolts, inner bezel, spinning dial,
+   flash burst, gold center. The reveal text fades in after the
+   dial finishes its sequence. */
+
+.vault {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center,
+    rgba(20, 20, 20, 0.96) 0%,
+    rgba(0, 0, 0, 0.98) 100%);
+  z-index: 999;
+  opacity: 0;
+  font-family: "barlow", sans-serif;
+}
+
+.vault.open {
+  display: flex;
+  animation: vault-fade 0.4s ease-out forwards;
+}
+
+@keyframes vault-fade {
+  to { opacity: 1; }
+}
+
+.vault-stage {
+  position: relative;
+  width: min(420px, 88vw);
+  aspect-ratio: 1;
+}
+
+.vault-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 60px rgba(212, 175, 55, 0.18));
+}
+
+.vd-door     { fill: #1a1a1a; stroke: #2f2f2f; stroke-width: 2; }
+.vd-inner    { fill: #232323; stroke: #3a3a3a; stroke-width: 1.5; }
+.vd-bolts    circle { fill: #555; }
+.vd-dial-bg  { fill: #2a2a2a; stroke: #5a5a5a; stroke-width: 1.5; }
+.vd-indicator{ fill: #d4af37; }
+.vd-center   { fill: #d4af37; }
+
+.vd-dial {
+  transform-origin: 200px 200px;
+  transform-box: fill-box;
+}
+
+.vd-flash {
+  fill: #fff;
+  opacity: 0;
+  transform-origin: 200px 200px;
+  transform-box: fill-box;
+  transform: scale(0);
+}
+
+/* Dial spin sequence — three turns with pauses ("clicks").
+   Final keyframe shrinks + fades the dial as the door "opens". */
+.vault.open .vd-dial {
+  animation: vd-spin 4.0s cubic-bezier(0.6, 0.05, 0.4, 1) forwards;
+}
+
+@keyframes vd-spin {
+  0%   { transform: rotate(0deg)   scale(1); }
+  25%  { transform: rotate(900deg) scale(1); }
+  32%  { transform: rotate(900deg) scale(1); }      /* click */
+  55%  { transform: rotate(420deg) scale(1); }
+  62%  { transform: rotate(420deg) scale(1); }      /* click */
+  85%  { transform: rotate(810deg) scale(1); }
+  92%  { transform: rotate(810deg) scale(1); }      /* final click */
+  100% { transform: rotate(810deg) scale(0.05); opacity: 0; }
+}
+
+/* White flash burst at the moment of unlock. */
+.vault.open .vd-flash {
+  animation: vd-flash 0.9s ease-out 3.7s forwards;
+}
+
+@keyframes vd-flash {
+  0%   { transform: scale(0);   opacity: 0; }
+  25%  { transform: scale(1.05); opacity: 0.95; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+/* Door, bolts, inner bezel, center all shrink away with the dial. */
+.vault.open .vd-door,
+.vault.open .vd-inner,
+.vault.open .vd-bolts,
+.vault.open .vd-center {
+  animation: vd-collapse 0.7s ease-in 3.85s forwards;
+  transform-origin: 200px 200px;
+  transform-box: fill-box;
+}
+
+@keyframes vd-collapse {
+  to { transform: scale(0); opacity: 0; }
+}
+
+/* The reveal sits on top of the SVG and fades in once the door's gone. */
+.vault-reveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.vault.open .vault-reveal {
+  animation: vault-reveal 0.8s ease-out 4.3s forwards;
+}
+
+@keyframes vault-reveal {
+  to { opacity: 1; pointer-events: auto; }
+}
+
+.vault-eyebrow {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  color: #d4af37;
+}
+
+.vault-code {
+  margin: 0;
+  font-size: clamp(44px, 11vw, 88px);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-shadow: 0 0 40px rgba(212, 175, 55, 0.45);
+}
+
+.vault-desc {
+  margin: 12px 0 32px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #bdbdbd;
+}
+
+.vault-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.vault-btn {
+  font-family: "barlow", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border-radius: 50px;
+  border: 1.5px solid #d4af37;
+  background: #d4af37;
+  color: #111;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vault-btn:hover { transform: translateY(-1px); }
+.vault-btn:active { transform: translateY(0); }
+
+.vault-btn--ghost {
+  background: transparent;
+  color: #d4af37;
+}
+
+.vault-btn--ghost:hover {
+  background: #d4af37;
+  color: #111;
+}
+
+.vault-btn.copied {
+  background: #fff;
+  border-color: #fff;
+  color: #111;
+}
