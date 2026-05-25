@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Proudly Average — Product Spread Test</title>
   <link rel="stylesheet" href="https://use.typekit.net/wfh3dbx.css">
-  <link rel="stylesheet" href="styles.css?v=11">
+  <link rel="stylesheet" href="styles.css?v=12">
 </head>
 <body>
   <main class="layout">
@@ -44,7 +44,7 @@
         <a class="cal-add-option" id="cal-add-google" role="menuitem"
            href="#" target="_blank" rel="noopener noreferrer">Google Calendar</a>
         <a class="cal-add-option" id="cal-add-apple" role="menuitem"
-           href="#" download="proudly-average-drop.ics">Apple Calendar</a>
+           href="#">Apple Calendar</a>
       </div>
     </div>
 
@@ -138,24 +138,10 @@
     });
     calGoogle.href = 'https://calendar.google.com/calendar/render?' + gParams.toString();
 
-    const icsLines = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//Proudly Average//Drop//EN',
-      'CALSCALE:GREGORIAN',
-      'METHOD:PUBLISH',
-      'BEGIN:VEVENT',
-      'UID:proudly-average-drop-2026-05-29@proudlyaverage',
-      'DTSTAMP:' + DROP_START_UTC,
-      'DTSTART:' + DROP_START_UTC,
-      'DTEND:' + DROP_END_UTC,
-      'SUMMARY:' + DROP_TITLE,
-      'DESCRIPTION:' + DROP_DESC,
-      'URL:' + location.origin + location.pathname,
-      'END:VEVENT',
-      'END:VCALENDAR',
-    ].join('\r\n');
-    calApple.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsLines);
+    // Point at the hosted drop.ics via webcal:// — iOS/macOS opens it
+    // directly in Calendar.app instead of downloading the file.
+    const icsPath = location.pathname.replace(/[^/]*$/, '') + 'drop.ics';
+    calApple.href = 'webcal://' + location.host + icsPath;
 
     function setCalOpen(open) {
       calMenu.hidden = !open;
