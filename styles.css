@@ -112,15 +112,34 @@ body.about {
   font-family: "barlow", sans-serif;
 }
 
+/* About-page nav — left-align the Back link with the article column
+   and pull it close to the top so the first heading sits high on the
+   page. Overrides .top-nav's shared centering + 56px top margin. */
 .about .top-nav {
-  padding: 32px 0 0;
-  margin-bottom: 56px;
+  max-width: 640px;
+  margin: 0 auto 16px;
+  padding: 16px 24px 0;
+  justify-content: flex-start;
 }
 
 .about-main {
   max-width: 640px;
   margin: 0 auto;
   padding: 0 24px 96px;
+}
+
+/* Mobile-only second Back link, anchored to the bottom-left of the
+   article column so readers don't have to scroll back to the top. */
+.about-back-bottom {
+  display: none;
+  margin-top: 40px;
+  justify-content: flex-start;
+}
+
+@media (max-width: 700px) {
+  .about-back-bottom {
+    display: flex;
+  }
 }
 
 .about-content h2 {
