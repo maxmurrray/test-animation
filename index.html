@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Proudly Average — Product Spread Test</title>
   <link rel="stylesheet" href="https://use.typekit.net/wfh3dbx.css">
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=11">
 </head>
 <body>
   <main class="layout">
@@ -32,6 +32,19 @@
       <div class="cd-unit">
         <span class="cd-num" id="cd-secs">--</span>
         <span class="cd-label">SEC</span>
+      </div>
+    </div>
+
+    <div class="cal-add">
+      <button type="button" class="cal-add-toggle" id="cal-add-toggle"
+              aria-expanded="false" aria-haspopup="true" aria-controls="cal-add-menu">
+        Mark your calendar
+      </button>
+      <div class="cal-add-menu" id="cal-add-menu" role="menu" hidden>
+        <a class="cal-add-option" id="cal-add-google" role="menuitem"
+           href="#" target="_blank" rel="noopener noreferrer">Google Calendar</a>
+        <a class="cal-add-option" id="cal-add-apple" role="menuitem"
+           href="#" download="proudly-average-drop.ics">Apple Calendar</a>
       </div>
     </div>
 
@@ -81,6 +94,12 @@
   </div>
 
   <script>
+    /* ---------- Drop event metadata ---------- */
+    const DROP_TITLE = 'Proudly Average Drop';
+    const DROP_DESC  = 'The Proudly Average drop goes live.';
+    const DROP_START_UTC = '20260529T160000Z'; // 12:00 PM EDT
+    const DROP_END_UTC   = '20260529T170000Z'; // 1 hr block
+
     /* ---------- Countdown to drop ----------
        Target: 2026-05-29 12:00 PM EDT (UTC-4) = 16:00 UTC. */
     const TARGET = new Date('2026-05-29T16:00:00Z').getTime();
@@ -101,6 +120,60 @@
       if (diff > 0) setTimeout(tick, 1000 - (Date.now() % 1000));
     }
     tick();
+
+    /* ---------- Mark your calendar ----------
+       Two-option dropdown: Google Calendar (URL) and Apple Calendar (.ics
+       file via data URL). The .ics also works in Outlook and any native
+       calendar app that handles iCal. */
+    const calToggle = document.getElementById('cal-add-toggle');
+    const calMenu   = document.getElementById('cal-add-menu');
+    const calGoogle = document.getElementById('cal-add-google');
+    const calApple  = document.getElementById('cal-add-apple');
+
+    const gParams = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: DROP_TITLE,
+      dates: DROP_START_UTC + '/' + DROP_END_UTC,
+      details: DROP_DESC,
+    });
+    calGoogle.href = 'https://calendar.google.com/calendar/render?' + gParams.toString();
+
+    const icsLines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Proudly Average//Drop//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      'UID:proudly-average-drop-2026-05-29@proudlyaverage',
+      'DTSTAMP:' + DROP_START_UTC,
+      'DTSTART:' + DROP_START_UTC,
+      'DTEND:' + DROP_END_UTC,
+      'SUMMARY:' + DROP_TITLE,
+      'DESCRIPTION:' + DROP_DESC,
+      'URL:' + location.origin + location.pathname,
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+    calApple.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsLines);
+
+    function setCalOpen(open) {
+      calMenu.hidden = !open;
+      calToggle.setAttribute('aria-expanded', String(open));
+    }
+    calToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setCalOpen(calMenu.hidden);
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.cal-add')) setCalOpen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !calMenu.hidden) setCalOpen(false);
+    });
+    // Picking an option also dismisses.
+    calGoogle.addEventListener('click', () => setCalOpen(false));
+    calApple.addEventListener('click', () => setCalOpen(false));
 
     const stage = document.getElementById('stage');
     const stacked = stage.querySelector('.stacked');
