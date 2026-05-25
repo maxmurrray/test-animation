@@ -175,7 +175,14 @@ body.about {
 .stage-wrap {
   width: min(67vh, 92vw);
   aspect-ratio: 2 / 3;
-  position: relative;
+  /* Pulled out of the .layout flex flow and centered in the viewport so
+     About Us and the countdown stay anchored at the top while the stack
+     sits at middle-middle. Keeps the spread animation contained on
+     shorter viewports where the bottom row was clipping. */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .stage {
