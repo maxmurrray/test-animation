@@ -79,8 +79,8 @@
     <div class="vault-stage">
       <div class="vault-reveal">
         <p class="vault-eyebrow">VAULT UNLOCKED</p>
-        <p class="vault-code" id="vault-code">HAPPY2026</p>
-        <p class="vault-desc">100% off your purchase</p>
+        <p class="vault-code" id="vault-code">AVERAGE2026</p>
+        <p class="vault-desc">20% off your purchase</p>
         <div class="vault-actions">
           <button type="button" class="vault-btn" id="vault-copy">Copy code</button>
           <button type="button" class="vault-btn vault-btn--ghost" id="vault-close">Close</button>
@@ -302,7 +302,7 @@
     }
 
     vaultCopyBtn.addEventListener('click', async () => {
-      const code = 'HAPPY2026';
+      const code = 'AVERAGE2026';
       try {
         await navigator.clipboard.writeText(code);
       } catch {

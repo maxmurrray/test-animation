@@ -252,6 +252,12 @@ body.about {
   transform: translate(-50%, calc(-50% + 12px));
 }
 
+/* Raise the stage above .cal-add (z-index: 2) once spread so the flying
+   products layer on top of "Mark your calendar" rather than behind it. */
+.stage-wrap:has(.stage.spread) {
+  z-index: 3;
+}
+
 .stage {
   position: relative;
   width: 100%;
